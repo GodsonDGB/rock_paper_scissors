@@ -1,60 +1,75 @@
-
-function getComputerChoice() {
-    let computerChoice = Math.random();
-    if (computerChoice < 0.33) {
-        return "pierre";
-    }else if (computerChoice > 0.66) {
-        return "papier";  
-    }else {
-        return "ciseaux";
-    }
-}
-
-function getHumanChoice() {
-    let humanChoice = window.prompt("Let's GO! PIERRE PAPIER OU CISEAUX").toLowerCase();
-    return humanChoice;
-}
-
 let humanScore = 0;
 let computerScore = 0;
 
-function playRound(humanChoice,computerChoice) {
-    if (computerChoice === humanChoice) {
-        return "Le prochain tour peut être. MATCH NUL.";
-    }else if (
-        (computerChoice === "pierre" && humanChoice === "papier") || 
-        (computerChoice === "papier" && humanChoice === "ciseaux") || 
-        (computerChoice === "ciseaux" && humanChoice === "papier")
-    ) {
-        humanScore++ ;
-        return "VOUS AVEZ GAGNE";
-    }else {
-        computerScore++ ;
-        return "VOUS AVEZ PERDU";
-    }
-    
+const playerScoreDisplay = document.querySelector("#player-score");
+const computerScoreDisplay = document.querySelector("#computer-score");
+const resultText = document.querySelector("#resultText");
+const buttons = document.querySelectorAll(".choice");
+const resetBtn = document.querySelector("#reset");
+
+function getComputerChoice() {
+    const choices = ["pierre", "papier", "ciseaux"];
+    return choices[Math.floor(Math.random() * choices.length)];
 }
 
-function playGame(){
-    for(let i = 1; i <= 5; i++) {
+function playRound(humanChoice, computerChoice){
+    const humanWins = 
+            (humanChoice === "pierre" && computerChoice === "ciseaux") || 
+            (humanChoice === "papier" && computerChoice === "pierre") || 
+            (humanChoice === "ciseaux" && computerChoice === "papier");
 
-        const humanSelection = getHumanChoice();
-        const computerSelection = getComputerChoice();
-        const result = playRound(computerSelection,humanSelection);
-        console.log(`Manche ${i}: ${result} (Vous:${humanScore},IA:${computerScore})`);
-
-    }
-
-    if (computerScore === humanScore){
-            console.log("PAS DE CHANCE. MATCH NUL AU BOUT DES CINQ MANCHES.");
-        
-        }else if(computerScore < humanScore) {
-            console.log("VOUS ETES LE GRAND GAGNANT.");
-        }
-        else{
-            console.log("VOUS ETES LE GRAND PERDANT.");
+    if (humanChoice === computerChoice) {
+        return {vainqueur: "Egalité", message: `VOUS AVEZ TOUS LES DEUX CHOISIS
+            - ${humanChoice}`
         }
 
-    }
+    }if (humanWins) {
+        humanScore++ ;
+        return {vainqueur:"VOUS", message: `VOUS AVEZ REMPORTE CETTE MANCHE - 
+            - ${humanChoice} BAT ${computerChoice} `};
+    }else {
+        computerScore++ ;
+         return {vainqueur:"L'IA", message:`VOUS AVEZ PERDU CETTE MANCHE
+            - ${computerChoice} BAT ${humanChoice}`};
+    }        
+}
 
-playGame()
+function updateUI(roundResult){
+    resultText.textContent = roundResult.message;
+    playerScoreDisplay.textContent = humanScore;
+    computerScoreDisplay.textContent = computerScore;
+}
+
+function disableButtons() {buttons.forEach(btn => btn.disabled = true); }
+function enableButtons() {buttons.forEach(btn => btn.disabled = false); }
+
+function checkWinner(){
+    if(humanScore === 5 || computerScore === 5){
+        const finalMsg = humanScore === 5
+        ? "🎉BRAVO VOUS AVEZ REMPORTE LA PARTIE !"
+        : "💻L'IA A REPORTE LA PARTIE.";
+        resultText.textContent = finalMsg; // Show final message
+        disableButtons(); // Disable buttons when game ends
+        resetBtn.hidden = false; // Show reset button
+    }
+}
+
+buttons.forEach(button => {
+    button.addEventListener("click", () => {
+        const humanChoice = button.dataset.choice;
+        const computerChoice = getComputerChoice();
+        const roundResult = playRound(humanChoice, computerChoice);
+        updateUI(roundResult);
+        checkWinner();
+    });
+});
+
+resetBtn.addEventListener("click", () => {
+    humanScore = 0;
+    computerScore = 0;
+    playerScoreDisplay.textContent = humanScore;
+    computerScoreDisplay.textContent = computerScore;
+    resultText.textContent = "NOUVELLE PARTIE - CHOISIS !";
+    enableButtons();
+    resetBtn.hidden = true;
+})

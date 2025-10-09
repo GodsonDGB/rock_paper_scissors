@@ -7,10 +7,27 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
         <script src="script.js"defer></script>
+        <link rel="stylesheet" href="style.css">
+
     </head>
 
     <body>
-        
-    </body>
+        <div class="game">
+            <h1>Pierre  -  Papier  -  Ciseaux</h1>
 
+            <div class="choices">
+                <button class="choice" data-choice="pierre">PIERRE</button>
+                <button class="choice" data-choice="papier">PAPIER</button>
+                <button class="choice" data-choice="ciseaux">CISEAUX</button>
+            </div>
+
+            <div class="result">  
+                <p id="resultText">Choisis pour commencer la partie.</p>
+                <p id="score">
+                    Joueur : <span id="player-score">0</span> - Ordi : <span id="computer-score">0</span>
+                </p>
+                <button id="reset">REJOUER</button>
+            </div>
+        </div>
+    </body>
 </html>
